@@ -8,25 +8,8 @@ from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
-
-def select_feedback_options(driver):
-    while(1):
-        driver.find_element(By.XPATH, "//input[@value='5']").click()
-        time.sleep(2)
-        nextButton = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@type='submit']")))
-        nextButton.click()
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@type='submit']")))
-
-        try:
-            dropdown = Select(driver.find_element(By.NAME, "Subject"))
-            time.sleep(2)
-            return
-        except NoSuchElementException:
-            time.sleep(2)
-            continue
-
-username = input("Enter your uid: ")
-password = input("Enter your password: ")
+username = 'u2109064'
+password = '211022'
 
 try:
     print("Logging in to you rsms account...")
@@ -43,44 +26,38 @@ try:
         raise SystemExit
     print("Successfully logged in...\n")
     
+    
     driver.find_element(By.NAME, "Userid").send_keys(username)
     driver.find_element(By.NAME, "Pass").send_keys(password)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@type='submit']")))
     driver.find_element(By.XPATH, "//input[@type='submit']").click()
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//input[@type='submit']")))
-     
-    dropdown = Select(driver.find_element(By.NAME, "Subject"))
-    options = [option.get_attribute("value") for option in dropdown.options]
+    print("Redirected to course feedback page...\n")
     
-    for optionn in options:
+    
+    dropdown = Select(driver.find_element(By.NAME, "Subject"))
+    options = dropdown.options
+    
+    for option in options:
         try: 
-            dropdown = Select(driver.find_element(By.NAME, "Subject"))
-            dropdown.select_by_value(optionn)
+            option_text = option.text
+            option_value = option.get_attribute("value")
+            print(option_text)
             
-            time.sleep(2)
-            driver.find_element(By.XPATH, "//input[@type='submit']").click()
-        
-            try:
-                driver.find_element(By.XPATH, "//input[@type='submit']")
-            except NoSuchElementException:
-                print(f"Questions not added by Teacher for {optionn}")
-                driver.back()
-                time.sleep(2)
-                continue
             
-        
-            select_feedback_options(driver)
-            print(f"Feedback for {optionn} completed")
 
-        except NoSuchElementException as e:
-            print(f"No sych element found: {e}")
+        except NoSuchElementException:
+            print("Feedback submission completed!.")
             break
         
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             break
+        
+
+    
+    
     
 finally:
-    time.sleep(0.5)
-    print("\nFeedback process completed.")
+    time.sleep(2)
     driver.quit()
